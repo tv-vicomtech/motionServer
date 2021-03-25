@@ -1,10 +1,10 @@
 {
-  "name" : "motionServer",
+  "name" : "motion-server",
   "version" : "0.0.1",
-  "main" : "./src/server.js",
+  "main" : "./server/server.js",
   "user" : "tidoust",
   "scripts": {
-    "start": "./src/server.js"
+    "start": "./server/server.js"
   },
   "description": "Basic implementation in Node.js using a WebSocket server of an online timing resource as defined in the draft Timing Object spec developed by the W3C Multi-Device Timing Community Group.",
   "keywords": [
@@ -12,17 +12,10 @@
     "clock",
     "synchronization"
   ],
-  "maintainers": [
-    {
-      "name": "François Daoust",
-      "email": "fd@w3.org"
-    }
-  ],
   "engines": {
     "node": "0.12.x",
     "npm": "2.7.x"
   },
-  "private": false,
   "licenses": [
     {
       "type": "W3C",
@@ -31,7 +24,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "http://github.com/tidoust/timingservice.git"
+    "url": "https://github.com/tv-vicomtech/motionServer"
   },
   "dependencies": {
     "amdefine": "0.1.0",
