@@ -1,10 +1,10 @@
 {
   "name" : "motion-server",
   "version" : "0.0.1",
-  "main" : "./server/server.js",
+  "main" : "./server/serverHttps.js",
   "user" : "tidoust",
   "scripts": {
-    "start": "node ./server/server.js"
+    "start": "node ./server/serverHttps.js"
   },
   "description": "Basic implementation in Node.js using a WebSocket server of an online timing resource as defined in the draft Timing Object spec developed by the W3C Multi-Device Timing Community Group.",
   "keywords": [
