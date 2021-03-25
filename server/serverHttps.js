@@ -20,8 +20,8 @@ var stringify = require('../src/utils').stringify;
 var cfg = {
   ssl: true,
   port: 8080,
-  ssl_key: '/home/VICOMTECH/itamayo/projects/tbargia-aldalur/certs/key.pem',
-  ssl_cert: '/home/VICOMTECH/itamayo/projects/tbargia-aldalur/certs/cert.pem',
+  ssl_key: path.resolve(__dirname, '../certs/key.pem'),
+  ssl_cert: path.resolve(__dirname, '../certs/cert.pem'),
   passphrase:'XXX'
 
 };
