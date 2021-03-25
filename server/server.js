@@ -121,8 +121,11 @@ var server = http.createServer(function (request, response) {
     readStream.pipe(response);
   });
 });
-server.listen(8080, function () {
-  logger.info('HTTP server is listening on port 8080');
+
+const port = process.env.PORT || 8080;
+
+server.listen(port, function () {
+  logger.info(`HTTP server is listening on port ${port}`);
 });
 logger.info('create HTTP server... done');
 

@@ -19,7 +19,7 @@ var stringify = require('../src/utils').stringify;
 
 var cfg = {
   ssl: true,
-  port: 8080,
+  port: process.env.PORT || 8080,
   ssl_key: path.resolve(__dirname, '../certs/key.pem'),
   ssl_cert: path.resolve(__dirname, '../certs/cert.pem'),
   passphrase:'XXX'
@@ -146,7 +146,7 @@ if ( cfg.ssl ) {
 
 
   }, processRequest ).listen( cfg.port,function () {
-    logger.info('HTTPS server is listening on port 8080');
+    logger.info(`HTTPS server is listening on port ${cfg.port}`);
   } );
 
 } else {
