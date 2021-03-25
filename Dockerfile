@@ -11,7 +11,7 @@ ENV NODE_ENV=production
 RUN mkdir -p /app
 WORKDIR /app
 COPY --from=builder /app .
-ARG PORT=5200
+ARG PORT=8080
 ENV PORT $PORT
 EXPOSE $PORT
 CMD ["npm", "start"]
