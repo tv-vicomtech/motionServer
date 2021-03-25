@@ -4,7 +4,7 @@
   "main" : "./server/server.js",
   "user" : "tidoust",
   "scripts": {
-    "start": "./server/server.js"
+    "start": "node ./server/server.js"
   },
   "description": "Basic implementation in Node.js using a WebSocket server of an online timing resource as defined in the draft Timing Object spec developed by the W3C Multi-Device Timing Community Group.",
   "keywords": [
