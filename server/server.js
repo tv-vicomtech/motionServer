@@ -16,10 +16,11 @@ var TimingObject = require('../src/TimingObject');
 var stringify = require('../src/utils').stringify;
 
 
-
+const { USE_HTTPS, PORT } = process.env;
+const useHttps = USE_HTTPS ? (USE_HTTPS === 'true') : true;
 var cfg = {
-  ssl: process.env.USE_HTTPS || true,
-  port: process.env.PORT || 8080,
+  ssl: useHttps,
+  port: PORT || 8080,
   ssl_key: path.resolve(__dirname, '../certs/key.pem'),
   ssl_cert: path.resolve(__dirname, '../certs/cert.pem'),
   passphrase:'XXX'
