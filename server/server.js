@@ -1,16 +1,14 @@
 /**
- * @fileOverview Basic Web socket server that can manage a set of timing objects
- *
- * To run the server from the root repository folder:
- *   node src/server.js
- */
+* @fileOverview Basic Web socket server that can manage a set of timing objects
+*
+* To run the server from the root repository folder:
+*   node src/server.js
+*/
 
 var woodman = require('woodman');
 var woodmanConfig = require('./woodmanConfig');
 var logger = woodman.getLogger('main');
 
-var WebSocketServer = require('websocket').server;
-var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
@@ -18,13 +16,28 @@ var TimingObject = require('../src/TimingObject');
 var stringify = require('../src/utils').stringify;
 
 
+
+var cfg = {
+  ssl: process.env.USE_HTTPS || true,
+  port: process.env.PORT || 8080,
+  ssl_key: path.resolve(__dirname, '../certs/key.pem'),
+  ssl_cert: path.resolve(__dirname, '../certs/cert.pem'),
+  passphrase:'XXX'
+
+};
+
+var httpServ = ( cfg.ssl ) ? require('https') : require('http');
+
+var WebSocketServer = require('websocket').server;
+var app      = null;
+
 /**
- * Implement filtering logic
- *
- * @function
- * @param {String} origin The origin that sent the reuqest
- * @returns {Boolean} true when the origin is allowed
- */
+* Implement filtering logic
+*
+* @function
+* @param {String} origin The origin that sent the reuqest
+* @returns {Boolean} true when the origin is allowed
+*/
 var originIsAllowed = function (origin) {
   logger.warn('TODO: implement origin check!');
   return true;
@@ -32,28 +45,28 @@ var originIsAllowed = function (origin) {
 
 
 /**
- * Return the content-type of a file from its extension
- */
+* Return the content-type of a file from its extension
+*/
 var getContentType = function (name) {
   var reExt = /\.([^\.]+)$/;
   var match = name.match(reExt);
   var ext =(match && match[1]) ? match[1] : '';
   switch (ext) {
-  case 'html': return 'text/html';
-  case 'js': return 'text/javascript';
-  default: return 'text/raw';
+    case 'html': return 'text/html';
+    case 'js': return 'text/javascript';
+    default: return 'text/raw';
   }
 };
 
 
 /**
- * Creates a "change" event listener that broadcasts the change to all
- * connected clients.
- *
- * @function
- * @param {Object} msg The sync message received
- * @returns {Object} Object to send back to the client over the socket
- */
+* Creates a "change" event listener that broadcasts the change to all
+* connected clients.
+*
+* @function
+* @param {Object} msg The sync message received
+* @returns {Object} Object to send back to the client over the socket
+*/
 var getChangeListenerFor = function (id) {
   return function (evt) {
     var value = evt.value;
@@ -83,10 +96,10 @@ Main server loop
 woodman.load(woodmanConfig);
 
 /**
- * The common delta in ms that all connected clients should apply
- * to change messages received from the server (to improve synchronicity
- * among clients)
- */
+* The common delta in ms that all connected clients should apply
+* to change messages received from the server (to improve synchronicity
+* among clients)
+*/
 var delta = 0;
 if (process.argv.length > 2) {
   try {
@@ -99,10 +112,10 @@ if (process.argv.length > 2) {
 }
 
 logger.info('create HTTP server...');
-var server = http.createServer(function (request, response) {
+var processRequest = function (request, response) {
   var filePath = null;
 
-  //logger.info('received request for', request.url);
+  logger.info('received request for', request.url);
   filePath = path.join(__dirname, '..', request.url);
   fs.stat(filePath, function (err, stat) {
     console.log(stat)
@@ -120,18 +133,35 @@ var server = http.createServer(function (request, response) {
     var readStream = fs.createReadStream(filePath);
     readStream.pipe(response);
   });
-});
+};
+if ( cfg.ssl ) {
 
-const port = process.env.PORT || 8080;
+  app = httpServ.createServer({
 
-server.listen(port, function () {
-  logger.info(`HTTP server is listening on port ${port}`);
-});
+    // providing server with  SSL key/cert
+    key: fs.readFileSync( cfg.ssl_key ),
+    cert: fs.readFileSync( cfg.ssl_cert ),
+    passphrase:cfg.passphrase
+
+
+
+  }, processRequest ).listen( cfg.port,function () {
+    logger.info(`HTTPS server is listening on port ${cfg.port}`);
+  } );
+
+} else {
+
+  app = httpServ.createServer( processRequest ).listen( cfg.port,function () {
+    logger.info(`HTTP server is listening on port ${cfg.port}`);
+  } );
+}
+
+
 logger.info('create HTTP server... done');
 
 logger.info('create WebSocket server...');
 var wsServer = new WebSocketServer({
-  httpServer: server,
+  httpServer: app,
   autoAcceptConnections: false
 });
 var connections = [];
@@ -161,7 +191,7 @@ wsServer.addListener('request', function (request) {
     var timing = null;
 
     if (message.type === 'utf8') {
-      //logger.info('received message', message.utf8Data);
+      logger.info('received message', message.utf8Data);
       try {
         request = JSON.parse(message.utf8Data);
       }
@@ -173,7 +203,7 @@ wsServer.addListener('request', function (request) {
       timing = timingAndConnections[request.id];
 
       switch (request.type) {
-      case 'info':
+        case 'info':
         // The client wants detailed information about the timing object
         // The command is also used to associate the Web socket connection
         // with the timing object so that "change" events propagate to all
@@ -189,18 +219,20 @@ wsServer.addListener('request', function (request) {
           timingAndConnections[request.id] = timing;
         }
         timing.connections.push(connection);
-        //logger.log('new connection to timing object','id=' + request.id,'nb=' + timing.connections.length);
+        logger.log('new connection to timing object',
+        'id=' + request.id,
+        'nb=' + timing.connections.length);
 
-        //logger.warn('TODO: add extra properties once available (e.g. range)');
+        logger.warn('TODO: add extra properties once available (e.g. range)');
         connection.sendUTF(stringify({
           type: 'info',
           id: request.id,
           vector: timing.timing.query()
         }));
-      //  logger.log('sent timing info', 'id=' + request.id);
+        logger.log('sent timing info', 'id=' + request.id);
         break;
 
-      case 'update':
+        case 'update':
         // The client wants to update the Timing Object's vector
         // Note that the update method will trigger a "change" event
         // and thus send the update back to all connected connections
@@ -211,55 +243,57 @@ wsServer.addListener('request', function (request) {
             vector.position,
             vector.velocity,
             vector.acceleration);
-      //    logger.log('updated timing object', 'id=' + request.id);
-          logger.warn('TODO: send update ack back to requester?');
-        }
-        else {
-          logger.warn('received an update request on unknown timing object',
+            logger.log('updated timing object', 'id=' + request.id);
+            logger.warn('TODO: send update ack back to requester?');
+          }
+          else {
+            logger.warn('received an update request on unknown timing object',
             'id=' + request.id, 'ignored');
+          }
+          break;
+
+          case 'sync':
+          // The client wants to synchronize its clock with that of the server
+          // NB: in this implementation, it's hard to measure the time taken to
+          // process the message. This would require digging into Web socket
+          // frames to record the time when the first byte is received.
+          var now = Date.now();
+          connection.sendUTF(stringify({
+            type: 'sync',
+            id: request.id,
+            client: {
+              sent: (request.client || {}).sent
+            },
+            server: {
+              received: now,
+              sent: now
+            },
+            delta: delta
+          }));
+          logger.log('sync message sent', 'id=' + request.id);
+          break;
+
+          default:
+          logger.log('unknown command',
+          'id=' + request.id, 'cmd=' + request.type, 'ignored');
         }
-        break;
-
-      case 'sync':
-        // The client wants to synchronize its clock with that of the server
-        // NB: in this implementation, it's hard to measure the time taken to
-        // process the message. This would require digging into Web socket
-        // frames to record the time when the first byte is received.
-        var now = Date.now();
-        connection.sendUTF(stringify({
-          type: 'sync',
-          id: request.id,
-          client: {
-            sent: (request.client || {}).sent
-          },
-          server: {
-            received: now,
-            sent: now
-          },
-          delta: delta
-        }));
-      //  logger.log('sync message sent', 'id=' + request.id);
-        break;
-
-      default:
-      //  logger.log('unknown command','id=' + request.id, 'cmd=' + request.type, 'ignored');
       }
-    }
-    else if (message.type === 'binary') {
-    //  logger.info('received binary message', 'ignored','length=' + message.binaryData.length + ' bytes');
-    }
-  });
-
-  connection.addListener('close', function(reasonCode, description) {
-    logger.info('peer disconnected', 'address=' + connection.remoteAddress);
-    connection.removeAllListeners('message');
-    connection.removeAllListeners('close');
-    _.forEach(timingAndConnections, function (timingAndConnection) {
-      if (_.contains(timingAndConnection.connections, connection)) {
-        timingAndConnection.connections = _.without(
-          timingAndConnection.connections,
-          connection);
+      else if (message.type === 'binary') {
+        logger.info('received binary message', 'ignored',
+        'length=' + message.binaryData.length + ' bytes');
       }
     });
-  });
-});
+
+    connection.addListener('close', function(reasonCode, description) {
+      logger.info('peer disconnected', 'address=' + connection.remoteAddress);
+      connection.removeAllListeners('message');
+      connection.removeAllListeners('close');
+      _.forEach(timingAndConnections, function (timingAndConnection) {
+        if (_.contains(timingAndConnection.connections, connection)) {
+          timingAndConnection.connections = _.without(
+            timingAndConnection.connections,
+            connection);
+          }
+        });
+      });
+    });
