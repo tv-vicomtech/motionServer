@@ -34,3 +34,8 @@ If you now run the server, it will create a HTTP server instead of HTTPS:
 ```bash
 npm start
 ```
+
+## Contributing
+
+If you want to contribute to this repository, please follow the instructions in [CONTRIBUTING.md](./CONTRIBUTING.md)
+
