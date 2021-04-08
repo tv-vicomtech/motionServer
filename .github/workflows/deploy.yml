@@ -1,0 +1,37 @@
+name: Build and publish to production
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build docker image and push to registry
+    runs-on: ubuntu-18.04
+    env:
+      IMAGE_NAME: ${{ secrets.DOCKER_REGISTRY }}/vicomtech/traction:motion-server
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Extract tag name
+      run: |
+        echo "TAG_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        echo "Tagging image with:" $TAG_NAME
+
+    - name: Get current revision SHA
+      run: git rev-parse HEAD > REVISION
+
+    - name: Login to registry
+      run: docker login -u ${{ secrets.DOCKER_USER }} -p "${{ secrets.DOCKER_PASS }}" ${{ secrets.DOCKER_REGISTRY }}
+    
+    - name: Build Docker image
+      run: docker build . --file Dockerfile --tag $IMAGE_NAME-$TAG_NAME
+
+    - name: Publish Docker image
+      id: push-to-registry
+      run: docker push $IMAGE_NAME-$TAG_NAME
+
+    - name: Use the image
+      run: echo "New image has been pushed with tag $IMAGE_NAME-$TAG_NAME"
+
