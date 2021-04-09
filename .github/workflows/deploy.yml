@@ -10,7 +10,8 @@ jobs:
     name: Build docker image and push to registry
     runs-on: ubuntu-18.04
     env:
-      IMAGE_NAME: ${{ secrets.DOCKER_REGISTRY }}/vicomtech/traction:motion-server
+      IMAGE_NAME: ${{ secrets.DOCKER_REGISTRY }}/vicomtech/traction
+      APP_NAME: motion-server
     steps:
     - uses: actions/checkout@v2
 
@@ -26,12 +27,21 @@ jobs:
       run: docker login -u ${{ secrets.DOCKER_USER }} -p "${{ secrets.DOCKER_PASS }}" ${{ secrets.DOCKER_REGISTRY }}
     
     - name: Build Docker image
-      run: docker build . --file Dockerfile --tag $IMAGE_NAME-$TAG_NAME
+      run: docker build . --file Dockerfile --tag $IMAGE_NAME:$APP_NAME-$TAG_NAME
 
     - name: Publish Docker image
       id: push-to-registry
-      run: docker push $IMAGE_NAME-$TAG_NAME
+      run: docker push $IMAGE_NAME:$APP_NAME-$TAG_NAME
 
     - name: Use the image
-      run: echo "New image has been pushed with tag $IMAGE_NAME-$TAG_NAME"
+      run: echo "New image has been pushed with tag $IMAGE_NAME:$APP_NAME-$TAG_NAME"
+  
+  deploy:
+    name: Call deploy hook
+    runs-on: ubuntu-18.04
+    needs: [ build ]
+    steps:
+      - uses: tv-vicomtech/workflow-webhook@v1.1.0
+        env:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}?image=${{ env.APP_NAME }}&tag=${{ env.TAG_NAME }}
 
