@@ -31,8 +31,11 @@ jobs:
     name: Call deploy hook
     runs-on: ubuntu-18.04
     needs: [ build ]
+    env:
+      APP_NAME: motion-server
+      TAG_NAME: v1.0.0
     steps:
       - uses: tv-vicomtech/workflow-webhook@v1.1.0
         env:
-          webhook_url: ${{ secrets.WEBHOOK_URL }}?token=${{ secrets.WEBHOOK_TOKEN }}&image=${{ env.APP_NAME }}&tag=${{ env.TAG_NAME }}
+          webhook_url: ${{ secrets.WEBHOOK_URL }}?token=${{ secrets.WEBHOOK_TOKEN }}&image=$APP_NAME&tag=$TAG_NAME
           webhook_auth: ${{ secrets.WEBHOOK_AUTH }}
