@@ -1,8 +1,8 @@
 {
-  "name" : "motion-server",
-  "version" : "0.0.1",
-  "main" : "./server/server.js",
-  "user" : "tidoust",
+  "name": "motion-server",
+  "version": "0.0.1",
+  "main": "./server/server.js",
+  "user": "tidoust",
   "scripts": {
     "start": "node ./server/server.js"
   },
@@ -36,10 +36,10 @@
     "promise": "7.1.1"
   },
   "devDependencies": {
-    "grunt": "0.4.5",
-    "grunt-contrib-concat": "0.5.1",
-    "grunt-contrib-requirejs" : "0.4.4",
-    "grunt-contrib-jshint": "0.11.2",
-    "jasmine-reporters": "2.0.6"
+    "grunt": "1.3.0",
+    "grunt-contrib-concat": "1.0.1",
+    "grunt-contrib-jshint": "3.0.0",
+    "grunt-contrib-requirejs": "1.0.0",
+    "jasmine-reporters": "2.4.0"
   }
 }
