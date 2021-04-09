@@ -40,7 +40,13 @@ jobs:
     name: Call deploy hook
     runs-on: ubuntu-18.04
     needs: [ build ]
+    env:
+      APP_NAME: motion-server
     steps:
+      - name: Extract tag name
+        run: |
+          echo "TAG_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          echo "Tagging image with:" $TAG_NAME
       - uses: tv-vicomtech/workflow-webhook@v1.1.0
         env:
           webhook_url: ${{ secrets.WEBHOOK_URL }}?token=${{ secrets.WEBHOOK_TOKEN }}&image=${{ env.APP_NAME }}&tag=${{ env.TAG_NAME }}
