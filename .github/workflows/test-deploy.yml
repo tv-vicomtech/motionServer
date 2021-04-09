@@ -37,5 +37,5 @@ jobs:
     steps:
       - uses: tv-vicomtech/workflow-webhook@v1.1.0
         env:
-          webhook_url: ${{ secrets.WEBHOOK_URL }}?token=${{ secrets.WEBHOOK_TOKEN }}&image=$APP_NAME&tag=$TAG_NAME
+          webhook_url: ${{ secrets.WEBHOOK_URL }}?token=${{ secrets.WEBHOOK_TOKEN }}&image=${{ env.APP_NAME }}&tag=${{ env.TAG_NAME }}
           webhook_auth: ${{ secrets.WEBHOOK_AUTH }}
