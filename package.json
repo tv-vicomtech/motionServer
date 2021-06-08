@@ -1,8 +1,8 @@
 {
-  "name" : "motion-server",
-  "version" : "0.0.1",
-  "main" : "./server/server.js",
-  "user" : "tidoust",
+  "name": "motion-server",
+  "version": "1.0.0",
+  "main": "./server/server.js",
+  "user": "tidoust",
   "scripts": {
     "start": "node ./server/server.js"
   },
@@ -29,17 +29,10 @@
   "dependencies": {
     "amdefine": "0.1.0",
     "event-target": "0.1.0",
+    "log4js": "6.3.0",
+    "promise": "7.1.1",
     "requirejs": "2.1.17",
-    "underscore": "1.8.3",
-    "websocket": "1.0.19",
-    "woodman": "1.1.0",
-    "promise": "7.1.1"
-  },
-  "devDependencies": {
-    "grunt": "0.4.5",
-    "grunt-contrib-concat": "0.5.1",
-    "grunt-contrib-requirejs" : "0.4.4",
-    "grunt-contrib-jshint": "0.11.2",
-    "jasmine-reporters": "2.0.6"
+    "underscore": "^1.13.1",
+    "websocket": "1.0.34"
   }
 }

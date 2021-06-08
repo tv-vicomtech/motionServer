@@ -24,8 +24,11 @@ if (typeof define !== 'function') {
 }
 
 define(function (require) {
-  var woodman = require('woodman');
-  var logger = woodman.getLogger('TimingObjectController');
+  var config = require('./woodmanConfig');
+  var log4js = require('log4js');
+  log4js.configure(config.loggers);
+  var logger = log4js.getLogger('TimingObjectController');
+  
 
   var EventTarget = require('event-target');
   var TimingObject = require('./TimingObject');

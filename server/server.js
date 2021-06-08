@@ -4,10 +4,10 @@
 * To run the server from the root repository folder:
 *   node src/server.js
 */
-
-var woodman = require('woodman');
-var woodmanConfig = require('./woodmanConfig');
-var logger = woodman.getLogger('main');
+var config = require('./woodmanConfig');
+var log4js = require('log4js');
+log4js.configure(config.loggers);
+var logger = log4js.getLogger('main');
 
 var fs = require('fs');
 var path = require('path');
@@ -93,8 +93,6 @@ var getChangeListenerFor = function (id) {
 Main server loop
 **********************************************************************/
 
-// Load logger configuration
-woodman.load(woodmanConfig);
 
 /**
 * The common delta in ms that all connected clients should apply

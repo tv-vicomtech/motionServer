@@ -14,8 +14,7 @@ if (typeof define !== 'function') {
 }
 
 define(function (require) {
-  var woodman = require('woodman');
-  var logger = woodman.getLogger('TimingProviderFactory');
+ 
   var AbstractTimingProvider = require('./AbstractTimingProvider');
 
 

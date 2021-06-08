@@ -12,8 +12,11 @@ if (typeof define !== 'function') {
 }
 
 define(function (require) {
-  var woodman = require('woodman');
-  var logger = woodman.getLogger('LocalTimingProvider');
+  var config = require('./woodmanConfig');
+  var log4js = require('log4js');
+  log4js.configure(config.loggers);
+  var logger = log4js.getLogger('LocalTimingProvider');
+
   var Promise = require('promise');
   var AbstractTimingProvider = require('./AbstractTimingProvider');
   var StateVector = require('./StateVector');

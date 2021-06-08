@@ -14,8 +14,11 @@ if (typeof define !== 'function') {
 }
 
 define(function (require) {
-  var woodman = require('woodman');
-  var logger = woodman.getLogger('AbstractTimingProvider');
+  var config = require('./woodmanConfig');
+  var log4js = require('log4js');
+  log4js.configure(config.loggers);
+  var logger = log4js.getLogger('AbstractTimingProvider');
+  
 
   var EventTarget = require('event-target');
   var StateVector = require('./StateVector');

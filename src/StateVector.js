@@ -17,8 +17,11 @@ if (typeof define !== 'function') {
 }
 
 define(function (require) {
-  var woodman = require('woodman');
-  var logger = woodman.getLogger('StateVector');
+  var config = require('./woodmanConfig');
+  var log4js = require('log4js');
+  log4js.configure(config.loggers);
+  var logger = log4js.getLogger('StateVector');
+  
 
   /**
    * Default constructor for a state vector
